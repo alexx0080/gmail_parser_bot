@@ -1,6 +1,6 @@
 from aiogram import Router, F
 from db_handler.db_class import db_object
-from aiogram.filters import Command
+from aiogram.filters import Command, or_f
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -13,7 +13,7 @@ class Registration(StatesGroup):
     waiting_for_email = State()
     waiting_for_password = State()
 
-@db_router.message(Command('sign_up'))
+@db_router.message(or_f(Command('sign_up'), F.text == 'Sign Up'))
 async def sign_up(message: Message, state: FSMContext):
     await message.answer("Let's add you in our service!\nPlease enter your email address:")
     await state.set_state(Registration.waiting_for_email)
@@ -58,7 +58,7 @@ async def read_users(message: Message):
 
 # Read one user
 # Read your own profile
-@db_router.message(Command('my_profile'))
+@db_router.message(or_f(Command('my_profile'), F.text == 'My profile'))
 async def read_me(message: Message):
     user = db_object.read_user_by_id(message.from_user.id)
     await message.answer(f'Here is your profile:\n\n    ID = {user[0]}\n    USERNAME = {user[1]}\n    EMAIL = {user[2]}\n    PASSWORD = {user[3]}\n')
@@ -106,7 +106,7 @@ async def continue_reading_interesting_user(message: Message, state: FSMContext)
 class ChangePassword(StatesGroup):
     waiting_for_new_password = State()
 
-@db_router.message(Command('change_password'))
+@db_router.message(or_f(Command('change_password'), F.text == 'Change Password'))
 async def change_password(message: Message, state: FSMContext):
     await message.answer('Enter new password')
     await state.set_state(ChangePassword.waiting_for_new_password)
