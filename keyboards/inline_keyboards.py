@@ -9,9 +9,9 @@ def github_link_keyboard():
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_keybord)
 
-def random_user_keyboard():
+def random_person_keyboard():
     inline_keyboard = [
-        [InlineKeyboardButton(text='Generate random person', callback_data='get_person')],
+        [InlineKeyboardButton(text='Generate random person', callback_data='generate_random_person')],
         [InlineKeyboardButton(text='Return home', callback_data='back_home')]
     ]
     return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
