@@ -2,7 +2,7 @@ import sqlite3
 
 class DataBase():
     def __init__(self):
-        self.__database = sqlite3.connect(r'C:\Users\USER\Desktop\gmail_parser_bot\database.db')
+        self.__database = sqlite3.connect(r'C:\Users\Алексей\Desktop\ТГ бот парсер gmail\database.db')
         self.__cursor = self.__database.cursor()
     
     def create_user_table(self):
@@ -39,6 +39,18 @@ class DataBase():
     def delete_user(self, id):
         self.__cursor.execute('DELETE FROM Users WHERE ID = ?', (id,))
         self.__database.commit()
+
+    def create_iphones_table(self):
+        self.__cursor.execute('''CREATE TABLE IF NOT EXISTS Iphones (text TEXT)''')
+        self.__database.commit()
+
+    def add_iphone(self, iphone):
+        self.__cursor.execute('''INSERT INTO Iphones (text) VALUES (?)''', (iphone,))
+        self.__database.commit()
+
+    def read_iphones(self):
+        self.__cursor.execute('''SELECT * FROM Iphones''')
+        return self.__cursor.fetchall()
 
     def close(self):
         self.__database.close()

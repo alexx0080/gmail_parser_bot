@@ -7,6 +7,7 @@ from aiogram.fsm.state import State, StatesGroup
 from create_bot import admins
 from validate_email import validate_email
 from utils.my_utils import check_password
+from keyboards.text_keyboards import back_home, change_password_k
 
 db_router = Router()
 
@@ -15,7 +16,7 @@ class Registration(StatesGroup):
     waiting_for_email = State()
     waiting_for_password = State()
 
-@db_router.message(or_f(Command('sign_up'), F.text == 'Sign Up'))
+@db_router.message(or_f(Command('sign_up'), F.text == '✏️ Sign Up ✏️'))
 async def sign_up(message: Message, state: FSMContext):
     await message.answer("Let's add you in our service!\nPlease enter your email address:")
     await state.set_state(Registration.waiting_for_email)
@@ -41,9 +42,9 @@ async def sign_up_get_password(message: Message, state: FSMContext):
             is_admin = 0
         try:
             db_object.add_user(message.from_user.id, message.from_user.username, data['email'], data['password'], is_admin)
-            await message.answer('Now you exist, congratulations!')
+            await message.answer('Now you exist, congratulations!', reply_markup=back_home())
         except:
-            await message.answer("You've already signed up")
+            await message.answer("You've already signed up", reply_markup=back_home())
         await state.clear()
     else:
         await message.answer(is_password_correct)
@@ -55,10 +56,10 @@ async def sign_up_get_password(message: Message, state: FSMContext):
 class ReadUser(StatesGroup):
     waiting_for_key = State()
 
-@db_router.message(Command('read_users'))
+@db_router.message(or_f(Command('read_users'), F.text == '📜 Read all 📜'))
 async def read_users(message: Message):
     if message.from_user.id not in admins:
-        await message.answer(f"Sorry, but you don't have an access to read data of all users")
+        await message.answer(f"Sorry, but you don't have an access to read data of all users", reply_markup=back_home())
     else:
         data = db_object.read_users()
         text = ''
@@ -66,29 +67,29 @@ async def read_users(message: Message):
         for user in data:
             count += 1
             text += f'USER {count}\n    ID = {user[0]}\n    USERNAME = {user[1]}\n    EMAIL = {user[2]}\n    PASSWORD = {user[3]}\n    IS_ADMIN = {user[4]}\n\n'       
-        await message.answer(f"Here the data of all users:\n\n{text}")
+        await message.answer(f"Here the data of all users:\n\n{text}", reply_markup=back_home())
 
 # Read one user
 # Read your own profile
-@db_router.message(or_f(Command('my_profile'), F.text == 'My profile'))
+@db_router.message(or_f(Command('my_profile'), F.text == '👀 My profile 👀'))
 async def read_me(message: Message):
     user = db_object.read_user_by_id(message.from_user.id)
-    await message.answer(f'Here is your profile:\n\n    ID = {user[0]}\n    USERNAME = {user[1]}\n    EMAIL = {user[2]}\n    PASSWORD = {user[3]}\n')
+    await message.answer(f'Here is your profile:\n\n    ID = {user[0]}\n    USERNAME = {user[1]}\n    EMAIL = {user[2]}\n    PASSWORD = {user[3]}\n', reply_markup=change_password_k())
 
 # Read user by id
-@db_router.message(Command('read_user_by_id'))
+@db_router.message(or_f(Command('read_user_by_id'), F.text == '🔑 Read by ID 🔑'))
 async def read_user_by_id(message: Message, state: FSMContext):
     if message.from_user.id not in admins:
-        await message.answer("Sorry, but you don't have an access to read data of other users")
+        await message.answer("Sorry, but you don't have an access to read data of other users", reply_markup=back_home())
     else:
         await message.answer('Enter ID of interesting user')
         await state.set_state(ReadUser.waiting_for_key)
 
 # Read user by username
-@db_router.message(Command('read_user_by_username'))
+@db_router.message(or_f(Command('read_user_by_username'), F.text == '📝 Read by username 📝'))
 async def read_user_by_username(message: Message, state: FSMContext):
     if message.from_user.id not in admins:
-        await message.answer("Sorry, but you don't have an access to read data of other users")
+        await message.answer("Sorry, but you don't have an access to read data of other users", reply_markup=back_home())
     else:
         await message.answer('Enter the username of interesting user')
         await state.set_state(ReadUser.waiting_for_key)
@@ -100,16 +101,16 @@ async def continue_reading_interesting_user(message: Message, state: FSMContext)
         id = int(message.text)
         try:
             user = db_object.read_user_by_id(id)
-            await message.answer(f'Here is the information:\n\n    ID = {user[0]}\n    USERNAME = {user[1]}\n    EMAIL = {user[2]}\n    PASSWORD = {user[3]}\n')
+            await message.answer(f'Here is the information:\n\n    ID = {user[0]}\n    USERNAME = {user[1]}\n    EMAIL = {user[2]}\n    PASSWORD = {user[3]}\n', reply_markup=back_home())
         except:
-            await message.answer("This user doesn't exist")
+            await message.answer("This user doesn't exist", reply_markup=back_home())
     except:
         username = message.text
         try:
             user = db_object.read_user_by_username(username)
-            await message.answer(f'Here is the information:\n\n    ID = {user[0]}\n    USERNAME = {user[1]}\n    EMAIL = {user[2]}\n    PASSWORD = {user[3]}\n')
+            await message.answer(f'Here is the information:\n\n    ID = {user[0]}\n    USERNAME = {user[1]}\n    EMAIL = {user[2]}\n    PASSWORD = {user[3]}\n', reply_markup=back_home())
         except:
-            await message.answer("This user doesn't exist")
+            await message.answer("This user doesn't exist", reply_markup=back_home())
     await state.clear()
 # End of block READ_USERS
 
@@ -118,14 +119,14 @@ async def continue_reading_interesting_user(message: Message, state: FSMContext)
 class ChangePassword(StatesGroup):
     waiting_for_new_password = State()
 
-@db_router.message(Command('change_password'))
+@db_router.message(or_f(Command('change_password'), F.text == '🔄 Change password 🔄'))
 async def change_password(message: Message, state: FSMContext):
     try:
         db_object.read_user_by_id(message.from_user.id)
-        await message.answer('Enter new password')
+        await message.answer('Enter new password', reply_markup=back_home())
         await state.set_state(ChangePassword.waiting_for_new_password)
     except:
-        await message.answer("You have to sign up")
+        await message.answer("You have to sign up", reply_markup=back_home())
         await state.clear()
 
 @db_router.message(ChangePassword.waiting_for_new_password)
@@ -135,7 +136,7 @@ async def end_changing_password(message: Message, state: FSMContext):
     if is_password_correct:
         await state.clear()
         db_object.change_password(message.from_user.id, new_password)
-        await message.answer('Password has been changed')
+        await message.answer('Password has been changed', reply_markup=back_home())
     else:
         await message.answer(is_password_correct)
 # End of block CHANGE_DATA
@@ -145,20 +146,20 @@ async def end_changing_password(message: Message, state: FSMContext):
 class DeleteUser(StatesGroup):
     waiting_for_id = State()
 
-@db_router.message(Command('delete_user'))
+@db_router.message(or_f(Command('delete_user'), F.text == '🗑️ Delete user 🗑️'))
 async def delete_user(message: Message, state: FSMContext):
     if message.from_user.id in admins:
-        await message.answer('Enter ID of user which you want to delete')
+        await message.answer('Enter ID of user which you want to delete', reply_markup=back_home())
         await state.set_state(DeleteUser.waiting_for_id)
     else:
-        await message.answer("Sorry, but you don't have an access to read data of other users")
+        await message.answer("Sorry, but you don't have an access to read data of other users", reply_markup=back_home())
 
 @db_router.message(DeleteUser.waiting_for_id)
 async def end_deleting_user(message: Message, state: FSMContext):
     try:
         db_object.delete_user(int(message.text))
-        await message.answer('User has been deleted')
+        await message.answer('User has been deleted', reply_markup=back_home())
     except:
-        await message.answer("This user doesn't exist")
+        await message.answer("This user doesn't exist", reply_markup=back_home())
     await state.clear()
 # End of block DELETE_USER

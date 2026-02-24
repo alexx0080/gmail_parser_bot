@@ -2,7 +2,7 @@ from aiogram import F, Router
 from aiogram.filters import Command, or_f
 from aiogram.types import Message, CallbackQuery
 from keyboards.inline_keyboards import github_link_keyboard, random_person_keyboard, faq_keyboard
-from keyboards.text_keyboards import share_data_keyboard
+from keyboards.text_keyboards import share_data_keyboard, back_home
 from utils.my_utils import get_random_person, questions
 
 study_router = Router()
@@ -10,17 +10,17 @@ study_router = Router()
 # Here I was working with buttons
 
 # Buttons to show links to my GitHub
-@study_router.message(or_f(Command('show_github'), F.text == 'GitHub of owner'))
+@study_router.message(or_f(Command('show_github'), F.text == '🔗 GitHub of owner 🔗'))
 async def show_github(message: Message):
     await message.answer(text='Here are links to my GitHub:', reply_markup=github_link_keyboard())
 
 # Buttons to share a phone number or a location
-@study_router.message(or_f(Command('share_data'), F.text == 'Share data'))
+@study_router.message(or_f(Command('share_data'), F.text == '✉️ Share data ✉️'))
 async def share_data(message: Message):
     await message.answer('What data do you want to share?', reply_markup=share_data_keyboard())
 
 # Buttons to generate a random person
-@study_router.message(or_f(Command('generate_person'), F.text == 'Generate random person'))
+@study_router.message(or_f(Command('generate_person'), F.text == '🥷 Generate random person 🥷'))
 async def random_person(message: Message):
     await message.answer('Do you want to generate a random person?', reply_markup=random_person_keyboard())
 
@@ -36,10 +36,10 @@ async def generate_random_person(call: CallbackQuery):
                         f"🎂 <b>Date of birth:</b> {user['date_of_birth']}\n"
                         f"💼 <b>Job:</b> {user['job']}\n"
                         )
-    await call.message.answer(formatted_message)
+    await call.message.answer(formatted_message, reply_markup=back_home())
 
 # Buttons to ask FAQ
-@study_router.message(or_f(Command('faq'), F.text == 'Look at FAQ'))
+@study_router.message(or_f(Command('faq'), F.text == '❓ Look at FAQ ❓'))
 async def show_faq(message: Message):
     await message.answer('Here are the most often asking question', reply_markup=faq_keyboard())
 

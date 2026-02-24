@@ -4,11 +4,12 @@ from handlers.start import start_router
 from handlers.work_with_db import db_router, db_object
 from handlers.user_info import info_router
 from handlers.studying import study_router
+from handlers.api import api_router
 
 async def main():
     try:
         db_object.create_user_table()
-        dp.include_routers(start_router, db_router, info_router, study_router)
+        dp.include_routers(start_router, db_router, info_router, study_router, api_router)
         await bot.delete_webhook(drop_pending_updates=True)
         await dp.start_polling(bot)
     finally:
