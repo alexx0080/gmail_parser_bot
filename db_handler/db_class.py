@@ -2,7 +2,7 @@ import sqlite3
 
 class DataBase():
     def __init__(self):
-        self.__database = sqlite3.connect(r'C:\Users\Алексей\Desktop\ТГ бот парсер gmail\database.db')
+        self.__database = sqlite3.connect(r'C:\Users\Алексей\Desktop\gmail_parser_bot\database.db')
         self.__cursor = self.__database.cursor()
     
     def create_user_table(self):

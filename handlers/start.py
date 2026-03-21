@@ -11,7 +11,7 @@ start_router = Router()
 main_keyboard = MainKeyboard()
 admin_keyboard = AdminKeyboard()
 
-@start_router.message(or_f(CommandStart(), F.data == 'back_home', F.text == '🏠 Back home 🏠'))
+@start_router.message(or_f(CommandStart(), F.text == '🏠 Back home 🏠'))
 async def cmd_start(message: Message, state: FSMContext):
     await state.clear()
     users = db_object.read_users()
@@ -28,11 +28,11 @@ async def back_home_call(call: CallbackQuery, state: FSMContext):
     await state.clear()
     users = db_object.read_users()
     ids = [user[0] for user in users]
-    if call.message.from_user.id not in ids:
-        await call.message.answer("Hello!👋\nHere are your abilities", reply_markup=main_keyboard.main_keyboard_for_unknown_person())
-    elif call.message.from_user.id in admins:
+    if call.from_user.id not in ids:
+        await call.message.answer(f"Hello!👋\nHere are your abilities, {call.from_user.id}", reply_markup=main_keyboard.main_keyboard_for_unknown_person())
+    elif call.from_user.id in admins:
         await call.message.answer("Hello!👋\nYou're admin and here are your abilities", reply_markup=main_keyboard.main_keyboard_for_admin())
-    elif call.message.from_user.id in ids:
+    elif call.from_user.id in ids:
         await call.message.answer("Hello!👋\nHere are your abilities", reply_markup=main_keyboard.main_keyboard_for_known_person())    
 
 @start_router.message(F.text == '📎 Other stuff 📎')

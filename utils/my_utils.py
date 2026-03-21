@@ -102,17 +102,17 @@ def html_to_text(html_content):
 def get_last_emails_from_gmail(quantity_of_messages):
     SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
     creds = None
-    if os.path.exists(r'C:\Users\Алексей\Desktop\ТГ бот парсер gmail\token.pickle'):
-        with open(r'C:\Users\Алексей\Desktop\ТГ бот парсер gmail\token.pickle', 'rb') as token:
+    if os.path.exists(r'C:\Users\Алексей\Desktop\gmail_parser_bot\token.pickle'):
+        with open(r'C:\Users\Алексей\Desktop\gmail_parser_bot\token.pickle', 'rb') as token:
             creds = pickle.load(token)
     else:
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
             else:
-                flow = InstalledAppFlow.from_client_secrets_file(r'c:\Users\Алексей\Downloads\client_secret_333251474072-smsabls16i24j6h8pnhh34537tabhalh.apps.googleusercontent.com.json', SCOPES)
+                flow = InstalledAppFlow.from_client_secrets_file(r'C:\Users\Алексей\Desktop\gmail_parser_bot\client_secret_333251474072-7v18t2s6525tm95rec5i2di57i3f4nss.apps.googleusercontent.com.json', SCOPES)
                 creds = flow.run_local_server(port=0)
-        with open(r'C:\Users\Алексей\Desktop\ТГ бот парсер gmail\token.pickle', 'wb') as token:
+        with open(r'C:\Users\Алексей\Desktop\gmail_parser_bot\token.pickle', 'wb') as token:
             pickle.dump(creds, token)
     service = build('gmail', 'v1', credentials=creds)
     results = service.users().messages().list(userId = 'me', maxResults = quantity_of_messages).execute()
